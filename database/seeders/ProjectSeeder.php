@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Technology;
 use App\Models\Project;
 use App\Models\Type;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
