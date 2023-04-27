@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Type;
+use App\Models\Technology;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,8 +34,10 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::orderBy('name', 'asc')->get();
+        $technologies = Technology::orderBy('name', 'asc')->get();
 
-        return view('projects.create', compact('types'));
+
+        return view('projects.create', compact('types', 'technologies'));
     }
 
     /**
@@ -50,10 +53,14 @@ class ProjectController extends Controller
             'description' => 'string|nullable',
             'slug' => 'string|required',
             'project_image' => 'string|nullable',
-            'project_id' => 'nullable|exists:types,id'
+            'project_id' => 'nullable|exists:types,id',
+            'technologies' => 'nullable|exists:technologies,id'
         ]);
-
         $project = Project::create($data);
+
+        if (isset($data['technologies'])) {
+            $project->technologies()->attach($data['technologies']);
+        }
 
         return to_route('projects.show', $project);
     }
@@ -77,7 +84,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return view('projects.edit', compact('project'));
+        $types = Type::orderBy('name', 'asc')->get();
+        $technologies = Technology::orderBy('name', 'asc')->get();
+        return view('projects.edit', compact('project', 'types','technologies'));
     }
 
     /**
@@ -95,6 +104,18 @@ class ProjectController extends Controller
          $project->description = $data['description'];
          $project->project_image = $data['project_image'];
          $project->save();
+
+         if ($data['title'] !== $project->title) {
+            $data['slug'] = Str::slug($data['title']);
+        }
+
+        $project->update($data);
+
+        if (isset($data['technologies'])) {
+            $project->technologies()->sync($data['technologies']);
+        } else {
+            $project->technologies()->sync([]);
+        }
          return to_route('projects.index', $project);
     }
 

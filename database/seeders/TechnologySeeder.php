@@ -19,11 +19,14 @@ class TechnologySeeder extends Seeder
      */
     public function run()
     {
+        $technology_ids = Technology::all()->pluck('id')->all();
         $technologies = ['css', 'html', 'js', 'sass', 'vue', 'sql', 'php', 'laravel'];
 
-        foreach($technologies as $tecnology) {
-            $new_tecnology->name = new Technology();
-            $new_tecnology->slug = Str::slug($tecnology);
+        foreach($technologies as $technology) {
+            $new_technology = new Technology();
+            $new_technology->name = $technology;
+            $new_technology->slug = Str::slug($technology);
+            $new_technology->save();
         }
     }
 }

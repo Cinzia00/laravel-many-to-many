@@ -22,4 +22,12 @@ class Project extends Model
     public function type() {
         return $this->belongsTo(Type::class, 'project_id');
     }
+
+    public function technologies() {
+        return $this->belongsToMany(Technology::class);
+    }
+
+    public function getTechnologiesIds() {
+        return $this->technologies->pluck('id')->all();
+    }
 }
